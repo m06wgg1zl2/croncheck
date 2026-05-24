@@ -63,3 +63,21 @@ func TestFieldNames(t *testing.T) {
 		t.Errorf("expected 5 field names, got %d", len(names))
 	}
 }
+
+// TestParse_FieldValues verifies that parsed field values match the raw tokens
+// from the original expression.
+func TestParse_FieldValues(t *testing.T) {
+	expr := "*/15 6 1-7 3 1,5"
+	want := []string{"*/15", "6", "1-7", "3", "1,5"}
+
+	result, err := parser.Parse(expr)
+	if err != nil {
+		t.Fatalf("unexpected error parsing %q: %v", expr, err)
+	}
+
+	for i, field := range result.Fields {
+		if field.Value != want[i] {
+			t.Errorf("field %d: expected value %q, got %q", i, want[i], field.Value)
+		}
+	}
+}
