@@ -8,6 +8,8 @@ import (
 
 // PrevRuns returns the n most recent past run times for the given cron expression,
 // working backwards from the reference time t.
+// The returned slice is ordered from most recent to least recent.
+// Returns nil if expr is nil, n <= 0, or no matches are found within the search window.
 func PrevRuns(expr *parser.Expression, t time.Time, n int) []time.Time {
 	if expr == nil || n <= 0 {
 		return nil
@@ -29,4 +31,15 @@ func PrevRuns(expr *parser.Expression, t time.Time, n int) []time.Time {
 	}
 
 	return results
+}
+
+// PrevRun returns the most recent past run time for the given cron expression,
+// working backwards from the reference time t.
+// Returns a zero Time and false if no match is found within the search window.
+func PrevRun(expr *parser.Expression, t time.Time) (time.Time, bool) {
+	runs := PrevRuns(expr, t, 1)
+	if len(runs) == 0 {
+		return time.Time{}, false
+	}
+	return runs[0], true
 }
