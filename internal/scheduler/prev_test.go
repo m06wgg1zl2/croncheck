@@ -77,3 +77,17 @@ func TestPrevRuns_DescendingOrder(t *testing.T) {
 		}
 	}
 }
+
+func TestPrevRuns_ExactRefNotIncluded(t *testing.T) {
+	// When ref aligns exactly with a cron tick, it should not be included;
+	// only strictly-before times are returned.
+	expr := mustParse(t, "0 * * * *")
+	ref := time.Date(2024, 6, 1, 12, 0, 0, 0, time.UTC)
+
+	runs := PrevRuns(expr, ref, 3)
+	for _, r := range runs {
+		if !r.Before(ref) {
+			t.Errorf("expected run %v to be strictly before ref %v", r, ref)
+		}
+	}
+}
