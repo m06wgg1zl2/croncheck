@@ -58,6 +58,21 @@ func ComputeStats(expr *parser.Expression, start, end time.Time) Stats {
 	return s
 }
 
+// WindowDuration returns the total duration of the stats window.
+func (s Stats) WindowDuration() time.Duration {
+	return s.WindowEnd.Sub(s.WindowStart)
+}
+
+// RunsPerHour returns the average number of runs per hour over the window.
+// Returns 0 if the window duration is less than one hour.
+func (s Stats) RunsPerHour() float64 {
+	hours := s.WindowDuration().Hours()
+	if hours <= 0 {
+		return 0
+	}
+	return float64(s.RunCount) / hours
+}
+
 func formatExpression(expr *parser.Expression) string {
 	if expr == nil {
 		return ""
